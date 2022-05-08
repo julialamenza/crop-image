@@ -2,7 +2,7 @@
 
 ## Architecture
 We have a simple serverless architecture, with an api gateway, a lambda and they upload it to S3.
-![Diagram](./docs/diagram.png)
+
 
 # Result
 The code is deployed on my personal AWS account.
@@ -21,7 +21,7 @@ Before deploying the project you should have `docker` and set up your AWS creden
 
 # Infra as code
 The infrastructure as code of this app is build with the [`serverless` framework](https://www.serverless.com/).
-The configuration is available in the [serverless.yml](serverless.yml) file.
+The configuration is available in the [serverless.yml](https://github.com/julialamenza/crop-image/blob/dev/serverless.yaml) file.
 
 ### Build the app
 If you want to deploy your lambda to the dev environment, you can still use:
@@ -29,7 +29,7 @@ If you want to deploy your lambda to the dev environment, you can still use:
 npm run deploy
 ```
 We are using **docker** to build and deploy the lambda.
-**Don't forgot to set your profile** on [package.json](package.json) file to be able to create the stack correct
+**Don't forgot to set your profile** on [package.json](https://github.com/julialamenza/crop-image/blob/dev/package.json) file to be able to create the stack correct
 
 ## Logging
 
