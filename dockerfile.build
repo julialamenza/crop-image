@@ -1,0 +1,7 @@
+FROM lambci/lambda:build-nodejs12.x as build
+WORKDIR /app
+ADD . /app
+RUN npm install --arch=x64 --platform=linux && npm build .
+
+FROM amaysim/serverless:1.67.2
+COPY --from=build /app /opt/app

@@ -1,0 +1,33 @@
+{
+  "name": "crop-image",
+  "version": "1.0.0",
+  "description": "Crop and send image to s3",
+  "main": "app.js",
+  "repository": "https://bitbucket.org/aircall/crop-image",
+  "author": "<arnaud.beun@aircall.io>",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "14.x"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.662.0",
+    "busboy": "^0.3.1",
+    "sharp": "^0.30.4"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "serverless": "^3.16.0"
+  },
+  "scripts": {
+    "deploy": "npm run docker:build && npm run deploy:dev",
+    "docker:build": "docker build -t lambda_build:latest -f dockerfile.build .",
+    "deploy:dev": "docker run --rm -v ~/.aws/:/root/.aws:ro  -e AWS_PROFILE=julia lambda_build:latest serverless deploy",
+    "package:prod": "docker run --rm -v $(pwd)/target:/opt/app/target lambda_build:latest serverless package --stage prod --package target/prod",
+    "deploy:prod": "docker run --rm -v ~/.aws/:/root/.aws:ro  -e AWS_PROFILE=<your-profile>  -v $(pwd)/target:/opt/app/target lambda_build:latest serverless deploy --stage prod --package target/prod",
+    "infra:metrics": "serverless metrics",
+    "infra:metrics:cropimage": "npm run infra:metrics -- -f crop-image",
+    "infra:logs": "serverless logs",
+    "infra:logs:cropimage": "npm run infra:logs -- -f crop-image"
+  }
+}

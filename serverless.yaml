@@ -1,0 +1,92 @@
+org: jlamenza
+app: crop-image
+service: crop-image
+
+custom:
+packagerOptions:
+      scripts:
+        - npm install --arch=x64 --platform=linux sharp
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  stackName: ${opt:stage, 'dev'}-${self:service}
+  deploymentBucket:
+    name: jlamenza
+  memorySize: 256
+
+  apiGateway:
+    binaryMediaTypes:
+      - 'multipart/form-data'
+  environment:
+    S3_BUCKET: !Ref DestinationBucket
+  tracing:
+    apiGateway: true
+    lambda: true
+
+package:
+  # We include only needed files to increase deployment/start speed.
+  exclude:
+    - ./*
+    - ./*/**
+  include:
+    - ./*.js
+    - ./node_modules/**
+
+functions:
+  crop-image:
+    environment:
+      S3_BUCKET: !Ref DestinationBucket
+    handler: app.lambdaHandler
+    role: AppRole
+    events:
+      - http:
+          path: /image
+          method: POST
+    dependsOn:
+      - DestinationBucket
+
+resources:
+  Resources:
+    # This resource is the bucket where the images are saved.
+    DestinationBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: "PublicRead"
+    AppRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        Path: /
+        Policies:
+          - PolicyName: S3_ACL
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:GetObject
+                  Resource:
+                    - !Join ['', [!GetAtt DestinationBucket.Arn, "/*"]]
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                  Resource:
+                    - !GetAtt DestinationBucket.Arn
+
+  Outputs:
+    DestinationBucketUrl:
+      Description: |
+        Crop Image function destination bucket Url
+      Value:
+        'Fn::GetAtt': [DestinationBucket, WebsiteURL]
