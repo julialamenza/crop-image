@@ -1,4 +1,4 @@
-org: jlamenza
+#org: jlamenza
 app: crop-image
 service: crop-image
 
@@ -68,21 +68,19 @@ resources:
                 - sts:AssumeRole
         Path: /
         Policies:
-          - PolicyName: S3_ACL
+          - PolicyName: crop-image
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - s3:PutObject
-                    - s3:GetObject
+                    - s3:*
+                    - s3-object-lambda:*
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
                   Resource:
                     - !Join ["", [!GetAtt DestinationBucket.Arn, "/*"]]
-                - Effect: Allow
-                  Action:
-                    - s3:ListBucket
-                  Resource:
-                    - !GetAtt DestinationBucket.Arn
 
   Outputs:
     DestinationBucketUrl:
