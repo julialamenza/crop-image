@@ -3,9 +3,9 @@ app: crop-image
 service: crop-image
 
 custom:
-packagerOptions:
-      scripts:
-        - npm install --arch=x64 --platform=linux sharp
+  packagerOptions:
+    scripts:
+      - npm install --arch=x64 --platform=linux sharp
 provider:
   name: aws
   runtime: nodejs14.x
